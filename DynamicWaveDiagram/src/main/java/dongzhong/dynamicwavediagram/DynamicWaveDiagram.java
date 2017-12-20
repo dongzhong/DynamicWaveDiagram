@@ -48,17 +48,21 @@ public class DynamicWaveDiagram extends View {
         final int paddingBottom = getPaddingBottom();
 
         int left, right, top, bottom;
-        if (getWidth() >= paddingLeft + paddingBottom) {
-
+        if (getWidth() >= paddingLeft + paddingRight) {
+            left = paddingLeft;
+            right = getWidth() - paddingRight;
         }
         else {
-
+            left = getWidth() / 2;
+            right = getWidth() / 2;
         }
         if (getHeight() >= paddingTop + paddingBottom) {
-
+            top = paddingTop;
+            bottom = getHeight() - paddingBottom;
         }
         else {
-
+            top = getHeight() / 2;
+            bottom = getHeight() / 2;
         }
     }
 }
