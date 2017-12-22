@@ -19,8 +19,9 @@ import dongzhong.dynamicwavediagram.drawingconfig.DrawingConfig;
 public class DynamicWaveDiagram extends View {
     private int updateTime = 500;
     private int pointNum = 100;
-    private float ceilValue = 10.0f;
-    private float floorValue = -10.0f;
+    private Number baseValue;
+    private Number ceilValue;
+    private Number floorValue;
 
     int paddingLeft = getPaddingLeft();
     int paddingRight = getPaddingRight();
@@ -32,6 +33,7 @@ public class DynamicWaveDiagram extends View {
 
     private Queue<Number> drawingData;
     private Queue<Number> cacheData;
+    private Queue<Number> historyData;
 
     private Timer drawTimer = new Timer();
 
@@ -131,6 +133,7 @@ public class DynamicWaveDiagram extends View {
      */
     public void writeData(Number data) {
         // TODO: 写入数据的逻辑
+        cacheData.offer(data);
     }
 
     /**
@@ -138,6 +141,15 @@ public class DynamicWaveDiagram extends View {
      */
     private void updateDate() {
         // TODO: 数据前移
+        Number latestHistoryData = drawingData.poll();
+        latestHistoryData = latestHistoryData == null
+                ? baseValue : latestHistoryData;
+        historyData.offer(latestHistoryData);
+
+        Number newestDrawingData = cacheData.poll();
+        newestDrawingData = newestDrawingData == null
+                ? baseValue : newestDrawingData;
+        drawingData.offer(newestDrawingData);
 
         invalidate();
     }
