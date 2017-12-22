@@ -184,19 +184,27 @@ public class DynamicWaveDiagram extends View {
         this.pointNum = pointNum;
     }
 
-    public float getCeilValue() {
+    public Number getBaseValue() {
+        return baseValue;
+    }
+
+    public void setBaseValue(Number baseValue) {
+        this.baseValue = baseValue;
+    }
+
+    public Number getCeilValue() {
         return ceilValue;
     }
 
-    public void setCeilValue(float ceilValue) {
+    public void setCeilValue(Number ceilValue) {
         this.ceilValue = ceilValue;
     }
 
-    public float getFloorValue() {
+    public Number getFloorValue() {
         return floorValue;
     }
 
-    public void setFloorValue(float floorValue) {
+    public void setFloorValue(Number floorValue) {
         this.floorValue = floorValue;
     }
     /*******************************************************/
