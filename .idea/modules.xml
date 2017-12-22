@@ -3,9 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DynamicWaveDiagram.iml" filepath="$PROJECT_DIR$/DynamicWaveDiagram.iml" />
-      <module fileurl="file://D:\MyCode\DynamicWaveDiagram\DynamicWaveDiagram.iml" filepath="D:\MyCode\DynamicWaveDiagram\DynamicWaveDiagram.iml" />
+      <module fileurl="file://D:/MyCode/DynamicWaveDiagram/DynamicWaveDiagram.iml" filepath="D:/MyCode/DynamicWaveDiagram/DynamicWaveDiagram.iml" />
       <module fileurl="file://$PROJECT_DIR$/DynamicWaveDiagram/DynamicWaveDiagram-DynamicWaveDiagram.iml" filepath="$PROJECT_DIR$/DynamicWaveDiagram/DynamicWaveDiagram-DynamicWaveDiagram.iml" />
-      <module fileurl="file://D:\MyCode\DynamicWaveDiagram\DynamicWaveDiagram\DynamicWaveDiagram-DynamicWaveDiagram.iml" filepath="D:\MyCode\DynamicWaveDiagram\DynamicWaveDiagram\DynamicWaveDiagram-DynamicWaveDiagram.iml" />
+      <module fileurl="file://D:/MyCode/DynamicWaveDiagram/DynamicWaveDiagram/DynamicWaveDiagram-DynamicWaveDiagram.iml" filepath="D:/MyCode/DynamicWaveDiagram/DynamicWaveDiagram/DynamicWaveDiagram-DynamicWaveDiagram.iml" />
     </modules>
   </component>
 </project>
