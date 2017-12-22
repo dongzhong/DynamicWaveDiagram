@@ -22,6 +22,10 @@ public class DynamicWaveDiagram extends View {
     private float ceilValue = 10.0f;
     private float floorValue = -10.0f;
 
+    int paddingLeft = getPaddingLeft();
+    int paddingRight = getPaddingRight();
+    int paddingTop = getPaddingTop();
+    int paddingBottom = getPaddingBottom();
     private DrawingRect drawingRect;
 
     private DrawingConfig drawingConfig = new DrawingConfig();
@@ -66,6 +70,11 @@ public class DynamicWaveDiagram extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        paddingLeft = getPaddingLeft();
+        paddingRight = getPaddingRight();
+        paddingTop = getPaddingTop();
+        paddingBottom = getPaddingBottom();
+
         calculateDrawingRect();
         drawDiagram(canvas, drawingRect);
     }
@@ -74,10 +83,6 @@ public class DynamicWaveDiagram extends View {
      * 根据padding计算绘制范围
      */
     private void calculateDrawingRect() {
-        final int paddingLeft = getPaddingLeft();
-        final int paddingRight = getPaddingRight();
-        final int paddingTop = getPaddingTop();
-        final int paddingBottom = getPaddingBottom();
         int left, right, top, bottom;
         if (getWidth() >= paddingLeft + paddingRight) {
             left = paddingLeft;
