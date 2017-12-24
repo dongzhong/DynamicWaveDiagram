@@ -8,7 +8,8 @@ import android.graphics.Color;
 
 public class DrawingConfig {
     private int waveColor = Color.BLACK;
-    private int backGroundColor = Color.WHITE;
+    private int backGroundColor = Color.CYAN;
+    private int limitLineColor = Color.BLACK;
 
     public DrawingConfig() {
 
@@ -28,5 +29,13 @@ public class DrawingConfig {
 
     public void setBackGroundColor(int backGroundColor) {
         this.backGroundColor = backGroundColor;
+    }
+
+    public int getLimitLineColor() {
+        return limitLineColor;
+    }
+
+    public void setLimitLineColor(int limitLineColor) {
+        this.limitLineColor = limitLineColor;
     }
 }

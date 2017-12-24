@@ -2,10 +2,18 @@ package dongzhong.dynamicwavediagram;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PathDashPathEffect;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,10 +31,10 @@ public class DynamicWaveDiagram extends View {
     private Number ceilValue;
     private Number floorValue;
 
-    int paddingLeft = getPaddingLeft();
-    int paddingRight = getPaddingRight();
-    int paddingTop = getPaddingTop();
-    int paddingBottom = getPaddingBottom();
+    int paddingLeft;
+    int paddingRight;
+    int paddingTop;
+    int paddingBottom;
     private DrawingRect drawingRect;
 
     private DrawingConfig drawingConfig = new DrawingConfig();
@@ -43,18 +51,33 @@ public class DynamicWaveDiagram extends View {
     /********************** Constructor **********************/
     public DynamicWaveDiagram(Context context) {
         super(context);
+        init();
     }
 
     public DynamicWaveDiagram(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
     public DynamicWaveDiagram(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
     }
 
     /**********************************************************/
 
+    private void init() {
+        baseValue = 0.0f;
+        ceilValue = 1.0f;
+        floorValue = -1.0f;
+
+        historyData = new LinkedList<>();
+        drawingData = new LinkedList<>();
+        cacheData = new LinkedList<>();
+        for (int i = 0; i < pointNum; i++) {
+            drawingData.offer(baseValue);
+        }
+    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -151,7 +174,8 @@ public class DynamicWaveDiagram extends View {
                 ? baseValue : newestDrawingData;
         drawingData.offer(newestDrawingData);
 
-        invalidate();
+        //invalidate();
+        postInvalidate();
     }
 
     /**
@@ -159,11 +183,36 @@ public class DynamicWaveDiagram extends View {
      * @param canvas
      */
     private void drawDiagram(Canvas canvas, DrawingRect drawingRect) {
-        if (isDrawingWave) { // 开始绘制
+        Paint paintBackground = new Paint();
+        paintBackground.setColor(drawingConfig.getBackGroundColor());
+        canvas.drawRect(drawingRect.getLeft(), drawingRect.getTop(),
+                drawingRect.getRight(), drawingRect.getBottom(),
+                paintBackground);
 
+        DashPathEffect dashPathEffect = new DashPathEffect(new float[] {1, 2}, 1);
+        Paint limitLinePaint = new Paint();
+        limitLinePaint.setColor(drawingConfig.getLimitLineColor());
+        limitLinePaint.setStyle(Paint.Style.STROKE);
+        limitLinePaint.setPathEffect(dashPathEffect);
+        Path dashPath = new Path();
+        dashPath.moveTo(drawingRect.getLeft(), (drawingRect.getBottom() - drawingRect.getTop()) / 4);
+        dashPath.lineTo(drawingRect.getRight(), (drawingRect.getBottom() - drawingRect.getTop()) / 4);
+        dashPath.moveTo(drawingRect.getLeft(), (drawingRect.getBottom() - drawingRect.getTop()) * 3 / 4);
+        dashPath.lineTo(drawingRect.getRight(), (drawingRect.getBottom() - drawingRect.getTop()) * 3 / 4);
+        canvas.drawPath(dashPath, limitLinePaint);
+
+        if (isDrawingWave) { // 开始绘制
+            Iterator<Number> iterator = drawingData.iterator();
+            int pointDrawingIndex = 0;
+            while (iterator.hasNext()) {
+
+            }
         }
         else { // 不绘制
-
+            Paint paintWave = new Paint();
+            paintWave.setColor(drawingConfig.getWaveColor());
+            canvas.drawLine(drawingRect.left, (drawingRect.top + drawingRect.bottom) / 2,
+                    drawingRect.right, (drawingRect.top + drawingRect.bottom) / 2, paintWave);
         }
     }
 
