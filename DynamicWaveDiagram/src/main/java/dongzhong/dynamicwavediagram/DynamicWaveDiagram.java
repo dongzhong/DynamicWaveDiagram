@@ -2,18 +2,14 @@ package dongzhong.dynamicwavediagram;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PathDashPathEffect;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Timer;
@@ -37,6 +33,11 @@ public class DynamicWaveDiagram extends View {
     private float baseDrawingCoordinate;
     private float ceilDrawingCoordinate;
     private float floorDrawingCoordinate;
+
+    private Number max;
+    private Number min;
+    private float maxDrawingCoordinate;
+    private float minDrawingCoordinate;
 
     int paddingLeft;
     int paddingRight;
@@ -78,12 +79,41 @@ public class DynamicWaveDiagram extends View {
         ceilValue = 1.0f;
         floorValue = -1.0f;
 
+        calculateMaxAndMin();
+        calculateBaseCeilFloorCoordinate();
+
         historyData = new LinkedList<>();
         drawingData = new LinkedList<>();
         cacheData = new LinkedList<>();
         for (int i = 0; i < pointNum; i++) {
             drawingData.offer(baseValue);
         }
+    }
+
+    /**
+     * 计算上下限
+     */
+    private void calculateMaxAndMin() {
+        max = Util.max(baseValue, ceilValue, floorValue);
+        min = Util.min(baseValue, ceilValue, floorValue);
+
+        maxDrawingCoordinate = (float) drawingRect.getTop() + (float) drawingRect.getHeight() * 9.0f / 10.0f;
+        minDrawingCoordinate = (float) drawingRect.getTop() + (float) drawingRect.getHeight() / 10.0f;
+    }
+
+    /**
+     * 计算baseValue、ceilValue和floorValue的绘制纵坐标
+     */
+    private void calculateBaseCeilFloorCoordinate() {
+        baseDrawingCoordinate = minDrawingCoordinate
+                + ((baseValue.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
+                * (maxDrawingCoordinate - minDrawingCoordinate);
+        ceilDrawingCoordinate = minDrawingCoordinate
+                + ((ceilValue.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
+                * (maxDrawingCoordinate - minDrawingCoordinate);
+        floorDrawingCoordinate = minDrawingCoordinate
+                + ((floorValue.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
+                * (maxDrawingCoordinate - minDrawingCoordinate);
     }
 
     @Override
@@ -108,6 +138,8 @@ public class DynamicWaveDiagram extends View {
         paddingBottom = getPaddingBottom();
 
         calculateDrawingRect();
+        calculateMaxAndMin();
+        calculateBaseCeilFloorCoordinate();
         drawDiagram(canvas, drawingRect);
     }
 
@@ -133,11 +165,6 @@ public class DynamicWaveDiagram extends View {
             bottom = getHeight() / 2;
         }
         drawingRect = new DrawingRect(left, right, top, bottom);
-    }
-
-    private void calculateBaseAndLimit() {
-        Number max = Util.max(baseValue, ceilValue, floorValue);
-        Number min = Util.min(baseValue, ceilValue, floorValue);
     }
 
     /**
@@ -200,6 +227,7 @@ public class DynamicWaveDiagram extends View {
         drawBackgroundAndLimitLine(canvas);
 
         if (isDrawingWave) { // 开始绘制
+            drawWave();
         }
         else { // 不绘制
             Paint paintWave = new Paint();
@@ -227,11 +255,30 @@ public class DynamicWaveDiagram extends View {
         limitLinePaint.setStyle(Paint.Style.STROKE);
         limitLinePaint.setPathEffect(dashPathEffect);
         Path dashPath = new Path();
-        dashPath.moveTo(drawingRect.getLeft(), (drawingRect.getBottom() - drawingRect.getTop()) / 5);
-        dashPath.lineTo(drawingRect.getRight(), (drawingRect.getBottom() - drawingRect.getTop()) / 5);
-        dashPath.moveTo(drawingRect.getLeft(), (drawingRect.getBottom() - drawingRect.getTop()) * 4 / 5);
-        dashPath.lineTo(drawingRect.getRight(), (drawingRect.getBottom() - drawingRect.getTop()) * 4 / 5);
+        dashPath.moveTo(drawingRect.getLeft(), minDrawingCoordinate);
+        dashPath.lineTo(drawingRect.getRight(), minDrawingCoordinate);
+        dashPath.moveTo(drawingRect.getLeft(), maxDrawingCoordinate);
+        dashPath.lineTo(drawingRect.getRight(), maxDrawingCoordinate);
         canvas.drawPath(dashPath, limitLinePaint);
+    }
+
+    /**
+     * 绘制波浪图
+     */
+    private void drawWave() {
+        drawingData.toArray()
+    }
+
+    /**
+     * 计算数据的绘制纵坐标
+     *
+     * @param number
+     * @return
+     */
+    private float calculatePointCoordinate(Number number) {
+        return minDrawingCoordinate
+                + ((number.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
+                * (maxDrawingCoordinate - minDrawingCoordinate);
     }
 
     /******************* Setter and Getter *****************/
@@ -333,6 +380,14 @@ public class DynamicWaveDiagram extends View {
 
         public void setBottom(int bottom) {
             this.bottom = bottom;
+        }
+
+        public int getWidth() {
+            return right - left;
+        }
+
+        public int getHeight() {
+            return bottom - top;
         }
     }
 
