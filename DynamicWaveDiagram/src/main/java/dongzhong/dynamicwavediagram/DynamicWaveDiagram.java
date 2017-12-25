@@ -287,6 +287,13 @@ public class DynamicWaveDiagram extends View {
      * @return
      */
     private float calculatePointCoordinate(Number number) {
+        if (number.floatValue() > max.floatValue()) {
+            return maxDrawingCoordinate;
+        }
+        if (number.floatValue() < min.floatValue()) {
+            return minDrawingCoordinate;
+        }
+
         return minDrawingCoordinate
                 - ((number.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
                 * (minDrawingCoordinate - maxDrawingCoordinate);
