@@ -10,6 +10,7 @@ import android.graphics.PathDashPathEffect;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.util.Iterator;
@@ -19,17 +20,23 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import dongzhong.dynamicwavediagram.drawingconfig.DrawingConfig;
+import dongzhong.dynamicwavediagram.util.Util;
 
 /**
  * Created by dongzhong on 2017/12/20.
  */
 
 public class DynamicWaveDiagram extends View {
-    private int updateTime = 500;
+    private final String TAG = "DynamicWaveDiagram";
+
+    private int updateTime = 100;
     private int pointNum = 100;
     private Number baseValue;
     private Number ceilValue;
     private Number floorValue;
+    private float baseDrawingCoordinate;
+    private float ceilDrawingCoordinate;
+    private float floorDrawingCoordinate;
 
     int paddingLeft;
     int paddingRight;
@@ -128,6 +135,11 @@ public class DynamicWaveDiagram extends View {
         drawingRect = new DrawingRect(left, right, top, bottom);
     }
 
+    private void calculateBaseAndLimit() {
+        Number max = Util.max(baseValue, ceilValue, floorValue);
+        Number min = Util.min(baseValue, ceilValue, floorValue);
+    }
+
     /**
      * 开始绘制
      */
@@ -174,6 +186,8 @@ public class DynamicWaveDiagram extends View {
                 ? baseValue : newestDrawingData;
         drawingData.offer(newestDrawingData);
 
+        Log.d(TAG, "drawingData的数据个数：" + drawingData.size());
+
         //invalidate();
         postInvalidate();
     }
@@ -183,30 +197,9 @@ public class DynamicWaveDiagram extends View {
      * @param canvas
      */
     private void drawDiagram(Canvas canvas, DrawingRect drawingRect) {
-        Paint paintBackground = new Paint();
-        paintBackground.setColor(drawingConfig.getBackGroundColor());
-        canvas.drawRect(drawingRect.getLeft(), drawingRect.getTop(),
-                drawingRect.getRight(), drawingRect.getBottom(),
-                paintBackground);
-
-        DashPathEffect dashPathEffect = new DashPathEffect(new float[] {1, 2}, 1);
-        Paint limitLinePaint = new Paint();
-        limitLinePaint.setColor(drawingConfig.getLimitLineColor());
-        limitLinePaint.setStyle(Paint.Style.STROKE);
-        limitLinePaint.setPathEffect(dashPathEffect);
-        Path dashPath = new Path();
-        dashPath.moveTo(drawingRect.getLeft(), (drawingRect.getBottom() - drawingRect.getTop()) / 4);
-        dashPath.lineTo(drawingRect.getRight(), (drawingRect.getBottom() - drawingRect.getTop()) / 4);
-        dashPath.moveTo(drawingRect.getLeft(), (drawingRect.getBottom() - drawingRect.getTop()) * 3 / 4);
-        dashPath.lineTo(drawingRect.getRight(), (drawingRect.getBottom() - drawingRect.getTop()) * 3 / 4);
-        canvas.drawPath(dashPath, limitLinePaint);
+        drawBackgroundAndLimitLine(canvas);
 
         if (isDrawingWave) { // 开始绘制
-            Iterator<Number> iterator = drawingData.iterator();
-            int pointDrawingIndex = 0;
-            while (iterator.hasNext()) {
-
-            }
         }
         else { // 不绘制
             Paint paintWave = new Paint();
@@ -216,6 +209,31 @@ public class DynamicWaveDiagram extends View {
         }
     }
 
+    /**
+     * 绘制背景及上下限
+     *
+     * @param canvas
+     */
+    private void drawBackgroundAndLimitLine(Canvas canvas) {
+        Paint paintBackground = new Paint();
+        paintBackground.setColor(drawingConfig.getBackGroundColor());
+        canvas.drawRect(drawingRect.getLeft(), drawingRect.getTop(),
+                drawingRect.getRight(), drawingRect.getBottom(),
+                paintBackground);
+
+        DashPathEffect dashPathEffect = new DashPathEffect(new float[] {5, 5}, 0);
+        Paint limitLinePaint = new Paint();
+        limitLinePaint.setColor(drawingConfig.getLimitLineColor());
+        limitLinePaint.setStyle(Paint.Style.STROKE);
+        limitLinePaint.setPathEffect(dashPathEffect);
+        Path dashPath = new Path();
+        dashPath.moveTo(drawingRect.getLeft(), (drawingRect.getBottom() - drawingRect.getTop()) / 5);
+        dashPath.lineTo(drawingRect.getRight(), (drawingRect.getBottom() - drawingRect.getTop()) / 5);
+        dashPath.moveTo(drawingRect.getLeft(), (drawingRect.getBottom() - drawingRect.getTop()) * 4 / 5);
+        dashPath.lineTo(drawingRect.getRight(), (drawingRect.getBottom() - drawingRect.getTop()) * 4 / 5);
+        canvas.drawPath(dashPath, limitLinePaint);
+    }
+
     /******************* Setter and Getter *****************/
     public int getUpdateTime() {
         return updateTime;
@@ -223,6 +241,19 @@ public class DynamicWaveDiagram extends View {
 
     public void setUpdateTime(int updateTime) {
         this.updateTime = updateTime;
+
+        if (isDrawingWave) {
+            if (drawTimer != null) {
+                drawTimer.cancel();
+            }
+            drawTimer = new Timer();
+            drawTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    updateDate();
+                }
+            }, 0, updateTime);
+        }
     }
 
     public int getPointNum() {
