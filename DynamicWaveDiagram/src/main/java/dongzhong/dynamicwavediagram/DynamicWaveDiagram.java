@@ -98,8 +98,8 @@ public class DynamicWaveDiagram extends View {
         max = Util.max(baseValue, ceilValue, floorValue);
         min = Util.min(baseValue, ceilValue, floorValue);
 
-        maxDrawingCoordinate = (float) drawingRect.getTop() + (float) drawingRect.getHeight() * 9.0f / 10.0f;
-        minDrawingCoordinate = (float) drawingRect.getTop() + (float) drawingRect.getHeight() / 10.0f;
+        minDrawingCoordinate = (float) drawingRect.getTop() + (float) drawingRect.getHeight() * 9.0f / 10.0f;
+        maxDrawingCoordinate = (float) drawingRect.getTop() + (float) drawingRect.getHeight() / 10.0f;
     }
 
     /**
@@ -107,14 +107,14 @@ public class DynamicWaveDiagram extends View {
      */
     private void calculateBaseCeilFloorCoordinate() {
         baseDrawingCoordinate = minDrawingCoordinate
-                + ((baseValue.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
-                * (maxDrawingCoordinate - minDrawingCoordinate);
+                - ((baseValue.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
+                * (minDrawingCoordinate - maxDrawingCoordinate);
         ceilDrawingCoordinate = minDrawingCoordinate
-                + ((ceilValue.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
-                * (maxDrawingCoordinate - minDrawingCoordinate);
+                - ((ceilValue.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
+                * (minDrawingCoordinate - maxDrawingCoordinate);
         floorDrawingCoordinate = minDrawingCoordinate
                 + ((floorValue.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
-                * (maxDrawingCoordinate - minDrawingCoordinate);
+                * (minDrawingCoordinate - maxDrawingCoordinate);
     }
 
     @Override
@@ -275,7 +275,6 @@ public class DynamicWaveDiagram extends View {
                 float y1 = calculatePointCoordinate((Number) pointsArray[i]);
                 float x2 = (float) drawingRect.getLeft() + (float) drawingRect.getWidth() * (float) (i + 1) / (float) pointsArray.length;
                 float y2 = calculatePointCoordinate((Number) pointsArray[i+1]);
-                Log.d(TAG, "x1=" + x1 + ", y1=" + y1 + ", x2=" + x2 + ", y2=" + y2);
                 canvas.drawLine(x1, y1, x2, y2, paint);
             }
         }
@@ -289,8 +288,8 @@ public class DynamicWaveDiagram extends View {
      */
     private float calculatePointCoordinate(Number number) {
         return minDrawingCoordinate
-                + ((number.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
-                * (maxDrawingCoordinate - minDrawingCoordinate);
+                - ((number.floatValue() - min.floatValue()) / (max.floatValue() - min.floatValue()))
+                * (minDrawingCoordinate - maxDrawingCoordinate);
     }
 
     /******************* Setter and Getter *****************/
