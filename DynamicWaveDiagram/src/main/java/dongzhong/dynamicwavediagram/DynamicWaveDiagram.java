@@ -79,6 +79,7 @@ public class DynamicWaveDiagram extends View {
         ceilValue = 1.0f;
         floorValue = -1.0f;
 
+        calculateDrawingRect();
         calculateMaxAndMin();
         calculateBaseCeilFloorCoordinate();
 
@@ -213,8 +214,6 @@ public class DynamicWaveDiagram extends View {
                 ? baseValue : newestDrawingData;
         drawingData.offer(newestDrawingData);
 
-        Log.d(TAG, "drawingData的数据个数：" + drawingData.size());
-
         //invalidate();
         postInvalidate();
     }
@@ -227,7 +226,7 @@ public class DynamicWaveDiagram extends View {
         drawBackgroundAndLimitLine(canvas);
 
         if (isDrawingWave) { // 开始绘制
-            drawWave();
+            drawWave(canvas);
         }
         else { // 不绘制
             Paint paintWave = new Paint();
@@ -265,8 +264,21 @@ public class DynamicWaveDiagram extends View {
     /**
      * 绘制波浪图
      */
-    private void drawWave() {
-        drawingData.toArray()
+    private void drawWave(Canvas canvas) {
+        Object[] pointsArray = drawingData.toArray();
+        if (pointsArray != null && pointsArray.length >= 1) {
+            Paint paint = new Paint();
+            paint.setColor(drawingConfig.getWaveColor());
+            paint.setStrokeWidth(10);
+            for (int i = 0; i < pointsArray.length - 1; i++) {
+                float x1 = (float) drawingRect.getLeft() + (float) drawingRect.getWidth() * (float) i / (float) pointsArray.length;
+                float y1 = calculatePointCoordinate((Number) pointsArray[i]);
+                float x2 = (float) drawingRect.getLeft() + (float) drawingRect.getWidth() * (float) (i + 1) / (float) pointsArray.length;
+                float y2 = calculatePointCoordinate((Number) pointsArray[i+1]);
+                Log.d(TAG, "x1=" + x1 + ", y1=" + y1 + ", x2=" + x2 + ", y2=" + y2);
+                canvas.drawLine(x1, y1, x2, y2, paint);
+            }
+        }
     }
 
     /**
